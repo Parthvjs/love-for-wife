@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Be My Valentine?</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #ffe6e6 0%, #ffb3b3 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            touch-action: none; 
+        }
+
+        /* Floating Hearts Background */
+        .heart-bg {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.6);
+            animation: floatUp linear infinite;
+            bottom: -50px;
+            z-index: 0;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
+
+        .container {
+            text-align: center;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            color: #d32f2f;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            min-height: 3rem; /* Prevents jumping when text changes */
+            transition: transform 0.2s;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Keeps buttons aligned as one grows */
+            gap: 20px;
+            min-height: 80px; 
+            position: relative;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease; /* Smooth growing */
+        }
+
+        #yesBtn {
+            background-color: #ff4081;
+            color: white;
+            z-index: 100;
+        }
+
+        #noBtn {
+            background-color: #ffffff;
+            color: #555;
+            border: 2px solid #ddd;
+            z-index: 50;
+            position: relative; 
+        }
+
+        /* Success Message */
+        #successMessage {
+            display: none;
+            text-align: center;
+        }
+        #successMessage img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .success-text {
+            color: #d32f2f;
+            font-size: 1.6rem;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="questionBox">
+            <h1 id="mainQuestion">Will you be my Valentine? 🌹</h1>
+            <div class="btn-group">
+                <button id="yesBtn">YES! 💖</button>
+                <button id="noBtn">No</button>
+            </div>
+        </div>
+
+        <div id="successMessage">
+            <div class="success-text">
+               Playing hard to get?<br>
+<br>The 'No' button learned that from you! 😉
+<br>waiting for you, Riddhi.😘
+            </div>
+            <br>
+            <img src="https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif" alt="Celebration">
+        </div>
+    </div>
+
+    <script>
+        /* --- 1. Background Hearts --- */
+        function createHearts() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart-bg');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 2 + 3 + 's';
+            heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 5000);
+        }
+        setInterval(createHearts, 400);
+
+        /* --- 2. Game Logic --- */
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const questionText = document.getElementById('mainQuestion');
+        const questionBox = document.getElementById('questionBox');
+        const successMessage = document.getElementById('successMessage');
+
+        // Variables for "Growing Yes"
+        let yesScale = 1; 
+        let currentIdx = 0;
+
+        // The "Guilt Trip" Messages
+        const messages = [
+            "Are you sure? 😢",
+            "Really sure? 🥺",
+            "Think about our Siya! 👶",
+            "I'll do the dishes! 🍽️",
+            "I'll buy you pizza! 🍕",
+            "Don't break my heart! 💔",
+            "Last chance! ⚠️",
+            "Okay, I'm gonna cry... 😭",
+            "You're so stubborn! ❤️",
+            "Just click YES already! 😂"
+        ];
+
+        // YES Button Click
+        yesBtn.addEventListener('click', () => {
+            questionBox.style.display = 'none'; 
+            successMessage.style.display = 'block'; 
+            setInterval(createHearts, 100); 
+        });
+
+        // The "Run Away + Guilt Trip" Logic
+        const moveButton = () => {
+            // 1. Move the No Button
+            const maxWidth = window.innerWidth - noBtn.offsetWidth - 20;
+            const maxHeight = window.innerHeight - noBtn.offsetHeight - 20;
+            const randomX = Math.random() * maxWidth;
+            const randomY = Math.random() * maxHeight;
+
+            noBtn.style.position = 'fixed'; // Switch to fixed to jump anywhere
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+
+            // 2. Change the Text (Cycle through messages)
+            questionText.innerText = messages[currentIdx];
+            currentIdx = (currentIdx + 1) % messages.length;
+
+            // 3. Make YES button bigger
+            yesScale += 0.2; // Grow by 20% each time
+            yesBtn.style.transform = `scale(${yesScale})`;
+
+            // 4. Fun little shake effect on text
+            questionText.style.transform = "rotate(2deg)";
+            setTimeout(() => { questionText.style.transform = "rotate(0deg)"; }, 100);
+        };
+
+        // Desktop Hover
+        noBtn.addEventListener('mouseenter', moveButton);
+
+        // Mobile Touch
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault(); 
+            moveButton();       
+        });
+
+    </script>
+</body>
+</html>
